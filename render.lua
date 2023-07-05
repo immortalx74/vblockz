@@ -19,8 +19,10 @@ function Render.Geometry( pass )
 end
 
 function Render.Grid( pass )
-	pass:setShader( grid_shader )
-	pass:plane( 0, 0, 0, 100, 100, -math.pi / 2, 1, 0, 0 )
+	if show_grid then
+		pass:setShader( grid_shader )
+		pass:plane( 0, 0, 0, 100, 100, -math.pi / 2, 1, 0, 0 )
+	end
 end
 
 function Render.Cursor( pass )
@@ -72,20 +74,22 @@ end
 
 function Render.ReferenceModel( pass )
 	if ref_model and show_ref_model then
-		pass:setShader()
+		-- pass:setShader()
 		pass:setColor( 1, 1, 1, ref_model_alpha )
-		pass:draw( ref_model )
+		pass:draw( ref_model, 0, 0, 0, ref_model_scale )
 		pass:setColor( 1, 1, 1, 1 )
 	end
 end
 
 function Render.UI( pass )
 	UI.NewFrame( pass )
-
 	UI.Begin( "FirstWindow", win_transform )
 
 	local button_bg_color = UI.GetColor( "button_bg" )
 
+	if UI.Button( "?" ) then
+		help_window_open = true
+	end
 	if cur_tool == e_tool.draw then UI.OverrideColor( "button_bg", active_tool_color ) end
 	if UI.Button( "Draw" ) then
 		cur_tool = e_tool.draw
@@ -113,23 +117,18 @@ function Render.UI( pass )
 	end
 	UI.OverrideColor( "button_bg", button_bg_color )
 
-	UI.Separator()
-
 	local ps, clicked, down, released, hovered, lx, ly = UI.WhiteBoard( "WhiteBoard1", 220, 220 )
 	ps:setColor( cur_color[ 1 ], cur_color[ 2 ], cur_color[ 3 ] )
 	ps:fill()
 	UI.SameLine()
 
 
-	r_released, cur_color[ 1 ] = UI.SliderFloat( "R", cur_color[ 1 ], 0, 1, 600, 3 )
+	local _
+	_, cur_color[ 1 ] = UI.SliderFloat( "R", cur_color[ 1 ], 0, 1, 600, 3 )
 	UI.SameColumn()
-	g_released, cur_color[ 2 ] = UI.SliderFloat( "G", cur_color[ 2 ], 0, 1, 600, 3 )
+	_, cur_color[ 2 ] = UI.SliderFloat( "G", cur_color[ 2 ], 0, 1, 600, 3 )
 	UI.SameColumn()
-	b_released, cur_color[ 3 ] = UI.SliderFloat( "B", cur_color[ 3 ], 0, 1, 600, 3 )
-	if r_released or g_released or b_released then
-		-- UI.SetColor( col_list[ col_list_idx ], { cur_color[ 1 ], cur_color[ 2 ], cur_color[ 3 ] } )
-	end
-	UI.Separator()
+	_, cur_color[ 3 ] = UI.SliderFloat( "B", cur_color[ 3 ], 0, 1, 600, 3 )
 
 	if UI.CheckBox( "wireframe", wireframe ) then
 		wireframe = not wireframe
@@ -146,7 +145,7 @@ function Render.UI( pass )
 
 	local _
 	_, ref_model_alpha = UI.SliderFloat( "Reference model alpha", ref_model_alpha, 0, 1, 840, 3 )
-
+	_, ref_model_scale = UI.SliderFloat( "Reference model scale", ref_model_scale, 0, 4, 840, 3 )
 
 	local _, _, _, buf = UI.TextBox( "filename", 21, export_filename )
 	UI.SameLine()
@@ -158,6 +157,26 @@ function Render.UI( pass )
 	end
 
 	UI.End( pass )
+
+	-- Help modal window
+	if help_window_open then
+		local m = mat4( win_transform ):translate( 0, 0, 0.01 )
+		UI.Begin( "help", m, true )
+		UI.Label( "A:          Toggle Draw/Erase tool", true )
+		UI.Label( "B:          Toggle Paint/EyeDropper tool", true )
+		UI.Label( "X:          Toggle ref model", true )
+		UI.Label( "Y:          Toggle wireframe", true )
+		UI.Label( "L Thumb:    Toggle UI interaction", true )
+		UI.Label( "R Trigger:  Use tool", true )
+		UI.Label( "L Grip:     Orbit", true )
+		UI.Label( "L + R Grip: Zoom (release L Grip first)", true )
+
+		if UI.Button( "Close" ) then
+			help_window_open = fasle
+			UI.EndModalWindow()
+		end
+		UI.End( pass )
+	end
 	return UI.RenderFrame( pass )
 end
 

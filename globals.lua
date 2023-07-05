@@ -15,6 +15,7 @@ cursor = { center = lovr.math.newVec3(), cell = lovr.math.newVec3(), unsnapped =
 cur_color = { 1, 1, 0 }
 unique_colors = {}
 export_filename = "mymodel"
+help_window_open = false
 
 win_transform = lovr.math.newMat4( 0, 1.4, -1 )
 hand = "hand/right"
@@ -22,9 +23,11 @@ interaction_enabled = true
 wireframe = false
 show_grid = true
 show_tool_label = true
-ref_model = lovr.graphics.newModel( "strawberry.glb" )
+-- ref_model = lovr.graphics.newModel( "strawberry.glb" )
+ref_model = lovr.graphics.newModel( "trex.glb" )
 show_ref_model = true
 ref_model_alpha = 1
+ref_model_scale = 1
 active_tool_color = { 0.3, 0.3, 1 }
 
 local vs = lovr.filesystem.read( "phong_shader.vs" )
@@ -46,7 +49,7 @@ function SetCursor()
 	local gz = grid_cell_z * unit
 	cursor.center:set( gx + (unit / 2), gy + (unit / 2), gz + (unit / 2) )
 	cursor.cell:set( grid_cell_x, grid_cell_y, grid_cell_z )
-	cursor.unsnapped:set(x,y,z)
+	cursor.unsnapped:set( x, y, z )
 end
 
 function UpdateToolLabel()
@@ -63,7 +66,7 @@ end
 function ShaderSend( pass )
 	pass:setShader( phong_shader )
 	pass:send( 'lightColor', { 0.5, 0.5, 0.5, 1.0 } )
-	pass:send( 'lightPos', { -8, 4, 8 } )
+	pass:send( 'lightPos', { 8, 4, 8 } )
 	pass:send( 'ambience', { 0.1, 0.1, 0.1, 1.0 } )
 	pass:send( 'specularStrength', 4 )
 	pass:send( 'metallic', 16 )

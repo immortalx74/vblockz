@@ -6,7 +6,6 @@ Tool = require "tool"
 
 function lovr.load()
 	UI.Init()
-	-- lovr.graphics.setBackgroundColor( 0.4, 0.4, 1 )
 	lovr.graphics.setBackgroundColor( 0.2, 0.2, 0.4 )
 end
 
@@ -100,16 +99,15 @@ end
 
 function lovr.draw( pass )
 	local ui_passes = Render.UI( pass )
-	-- Regular drawing should be done here...
 
 	pass:transform( scene.transform )
 	ShaderSend( pass )
 
-	Render.Grid( pass )
 	Render.Axis( pass )
 	Render.Geometry( pass )
 	Render.Cursor( pass )
 	Render.ReferenceModel( pass )
+	Render.Grid( pass )
 
 	table.insert( ui_passes, pass )
 	return lovr.graphics.submit( ui_passes )
