@@ -143,6 +143,10 @@ function Render.UI( pass )
 		show_grid = not show_grid
 	end
 
+	if UI.Button( "Load reference model..." ) then
+		ref_model_load_window_open = true
+	end
+
 	local _
 	_, ref_model_alpha = UI.SliderFloat( "Reference model alpha", ref_model_alpha, 0, 1, 840, 3 )
 	_, ref_model_scale = UI.SliderFloat( "Reference model scale", ref_model_scale, 0, 4, 840, 3 )
@@ -175,6 +179,29 @@ function Render.UI( pass )
 			help_window_open = fasle
 			UI.EndModalWindow()
 		end
+		UI.End( pass )
+	end
+
+	-- Load ref model modal window
+	if ref_model_load_window_open then
+		local m = mat4( win_transform ):translate( 0, 0, 0.01 )
+		UI.Begin( "load_ref_model", m, true )
+		local files = lovr.filesystem.getDirectoryItems( "ref" )
+		local _, idx = UI.ListBox( "files", 10, 21, files, 1 )
+
+		if UI.Button( "Cancel" ) then
+			ref_model_load_window_open = fasle
+			UI.EndModalWindow()
+		end
+
+		if UI.Button( "OK" ) then
+			ref_model = nil
+			collectgarbage( "collect" )
+			ref_model = lovr.graphics.newModel( "ref/" .. files[ idx ] )
+			ref_model_load_window_open = fasle
+			UI.EndModalWindow()
+		end
+
 		UI.End( pass )
 	end
 	return UI.RenderFrame( pass )

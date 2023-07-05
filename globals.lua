@@ -16,6 +16,7 @@ cur_color = { 1, 1, 0 }
 unique_colors = {}
 export_filename = "mymodel"
 help_window_open = false
+ref_model_load_window_open = false
 
 win_transform = lovr.math.newMat4( 0, 1.4, -1 )
 hand = "hand/right"
@@ -23,8 +24,7 @@ interaction_enabled = true
 wireframe = false
 show_grid = true
 show_tool_label = true
--- ref_model = lovr.graphics.newModel( "strawberry.glb" )
-ref_model = lovr.graphics.newModel( "trex.glb" )
+ref_model = nil
 show_ref_model = true
 ref_model_alpha = 1
 ref_model_scale = 1
