@@ -16,6 +16,13 @@ function Render.Geometry( pass )
 			pass:box( v.x, v.y, v.z, unit, unit, unit, 0, 0, 0, 0, "line" )
 		end
 	end
+
+	for i, v in ipairs( volume.temp_storage ) do
+		pass:setColor( v.r, v.g, v.b )
+		pass:box( v.x, v.y, v.z, unit, unit, unit )
+		pass:setColor( 0, 0, 0 )
+		pass:box( v.x, v.y, v.z, unit, unit, unit, 0, 0, 0, 0, "line" )
+	end
 end
 
 function Render.Grid( pass )
@@ -114,6 +121,13 @@ function Render.UI( pass )
 	if cur_tool == e_tool.eydropper then UI.OverrideColor( "button_bg", active_tool_color ) end
 	if UI.Button( "EyeDropper" ) then
 		cur_tool = e_tool.eydropper
+	end
+	UI.OverrideColor( "button_bg", button_bg_color )
+
+	UI.SameLine()
+	if cur_tool == e_tool.volume then UI.OverrideColor( "button_bg", active_tool_color ) end
+	if UI.Button( "Volume" ) then
+		cur_tool = e_tool.volume
 	end
 	UI.OverrideColor( "button_bg", button_bg_color )
 

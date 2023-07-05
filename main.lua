@@ -81,6 +81,18 @@ function lovr.update( dt )
 		scene.transform:scale( scene.scale )
 	end
 
+	if lovr.headset.wasPressed( hand, "trigger" ) and not interaction_enabled then
+		if cur_tool == e_tool.volume then
+			volume.start_cell:set( cursor.cell )
+		end
+	end
+
+	if lovr.headset.wasReleased( hand, "trigger" ) and not interaction_enabled then
+		if cur_tool == e_tool.volume then
+			Tool.Volume( true )
+		end
+	end
+
 	if lovr.headset.isDown( hand, "trigger" ) and not interaction_enabled then
 		if cur_tool == e_tool.draw then
 			Tool.Draw()
@@ -93,6 +105,9 @@ function lovr.update( dt )
 		end
 		if cur_tool == e_tool.eydropper then
 			Tool.EyeDropper()
+		end
+		if cur_tool == e_tool.volume then
+			Tool.Volume( false )
 		end
 	end
 end

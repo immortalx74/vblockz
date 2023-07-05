@@ -2,13 +2,14 @@ e_tool = {
 	draw = 1,
 	erase = 2,
 	paint = 3,
-	eydropper = 4
+	eydropper = 4,
+	volume = 5
 }
 
 scene = { transform = lovr.math.newMat4( vec3( 0, 0.5, -0.3 ) ), offset = lovr.math.newMat4(), last_transform = lovr.math.newMat4(), scale = 0.03, old_distance = 0 }
 scene.transform:scale( scene.scale )
-cur_tool = e_tool.draw
-cur_tool_label = "Draw"
+cur_tool = e_tool.volume
+volume = { start_cell = lovr.math.newVec3(), temp_storage = {} }
 unit = 1
 collection = {}
 cursor = { center = lovr.math.newVec3(), cell = lovr.math.newVec3(), unsnapped = lovr.math.newVec3() }
@@ -57,6 +58,7 @@ function UpdateToolLabel()
 	if cur_tool == e_tool.erase then cur_tool_label = "Erase" end
 	if cur_tool == e_tool.paint then cur_tool_label = "Paint" end
 	if cur_tool == e_tool.eydropper then cur_tool_label = "EyeDropper" end
+	if cur_tool == e_tool.volume then cur_tool_label = "Volume" end
 end
 
 function MapRange( from_min, from_max, to_min, to_max, v )
