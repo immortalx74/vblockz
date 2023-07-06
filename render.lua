@@ -3,19 +3,8 @@ require "globals"
 local Render = {}
 
 function Render.Geometry( pass )
-	pass:setShader( phong_shader )
-	for i, v in ipairs( collection ) do
-		if wireframe then
-			pass:setColor( v.r, v.g, v.b )
-			pass:box( v.x, v.y, v.z, 0.001, 0.001, 0.001 )
-			pass:box( v.x, v.y, v.z, unit, unit, unit, 0, 0, 0, 0, "line" )
-		else
-			pass:setColor( v.r, v.g, v.b )
-			pass:box( v.x, v.y, v.z, unit, unit, unit )
-			pass:setColor( 0, 0, 0 )
-			pass:box( v.x, v.y, v.z, unit, unit, unit, 0, 0, 0, 0, "line" )
-		end
-	end
+	local count = #collection
+	pass:draw( mdl_cube, mat4(), nil, true, count )
 
 	for i, v in ipairs( volume.temp_storage ) do
 		pass:setColor( v.r, v.g, v.b )
@@ -35,7 +24,7 @@ end
 function Render.Cursor( pass )
 	if not interaction_enabled then
 		-- Cursor
-		pass:setColor( 1, 0, 1 )
+		pass:setShader()
 
 		if cur_tool ~= e_tool.erase then
 			pass:setColor( cur_color[ 1 ], cur_color[ 2 ], cur_color[ 3 ] )
@@ -58,16 +47,6 @@ function Render.Cursor( pass )
 end
 
 function Render.Axis( pass )
-	-- pass:setShader()
-	-- pass:setColor( 1, 0, 0 )
-	-- pass:line( 0, 0, 0, 0, 0.5 * (1 / scene.scale), 0 )
-
-	-- pass:setColor( 0, 1, 0 )
-	-- pass:line( 0, 0, 0, 0, 0, -0.5 * (1 / scene.scale) )
-
-	-- pass:setColor( 0, 0, 1 )
-	-- pass:line( 0, 0, 0, 0.5 * (1 / scene.scale), 0, 0 )
-
 	pass:setShader()
 	pass:setColor( 1, 0, 0 )
 	pass:line( 0, 0, 0, 0, 5, 0 )
@@ -91,7 +70,7 @@ end
 function Render.UI( pass )
 	UI.NewFrame( pass )
 	UI.Begin( "FirstWindow", win_transform )
-
+	UI.Label( tostring( #collection ) )
 	local button_bg_color = UI.GetColor( "button_bg" )
 
 	if UI.Button( "?" ) then

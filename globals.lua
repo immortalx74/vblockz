@@ -8,7 +8,7 @@ e_tool = {
 
 scene = { transform = lovr.math.newMat4( vec3( 0, 0.5, -0.3 ) ), offset = lovr.math.newMat4(), last_transform = lovr.math.newMat4(), scale = 0.03, old_distance = 0 }
 scene.transform:scale( scene.scale )
-cur_tool = e_tool.volume
+cur_tool = e_tool.draw
 volume = { start_cell = lovr.math.newVec3(), temp_storage = {} }
 unit = 1
 collection = {}
@@ -20,7 +20,7 @@ help_window_open = false
 ref_model_load_window_open = false
 
 win_transform = lovr.math.newMat4( 0, 1.4, -1 )
-hand = "hand/right"
+hand = "hand/left"
 interaction_enabled = true
 wireframe = false
 show_grid = true
@@ -30,6 +30,7 @@ show_ref_model = true
 ref_model_alpha = 1
 ref_model_scale = 1
 active_tool_color = { 0.3, 0.3, 1 }
+mdl_cube = lovr.graphics.newModel( "cube.glb" )
 
 local vs = lovr.filesystem.read( "phong_shader.vs" )
 local fs = lovr.filesystem.read( "phong_shader.fs" )
@@ -37,6 +38,11 @@ phong_shader = lovr.graphics.newShader( vs, fs )
 local vs = lovr.filesystem.read( "grid_shader.vs" )
 local fs = lovr.filesystem.read( "grid_shader.fs" )
 grid_shader = lovr.graphics.newShader( vs, fs, { flags = { highp = true } } )
+
+cube_transforms = {}
+cube_colors = {}
+gpu_transforms_buf = lovr.graphics.newBuffer( 40000, "mat4" )
+gpu_colors_buf = lovr.graphics.newBuffer( 40000, "vec4" )
 
 function SetCursor()
 	local pt = mat4( scene.transform )
@@ -66,10 +72,29 @@ function MapRange( from_min, from_max, to_min, to_max, v )
 end
 
 function ShaderSend( pass )
+	pass:setCullMode( "back" )
 	pass:setShader( phong_shader )
 	pass:send( 'lightColor', { 0.5, 0.5, 0.5, 1.0 } )
 	pass:send( 'lightPos', { 8, 4, 8 } )
 	pass:send( 'ambience', { 0.1, 0.1, 0.1, 1.0 } )
 	pass:send( 'specularStrength', 4 )
 	pass:send( 'metallic', 16 )
+	pass:send( 'CubeTransforms', gpu_transforms_buf )
+	pass:send( 'CubeColors', gpu_colors_buf )
+end
+
+function FillBuffers()
+	cube_transforms = {}
+	cube_colors = {}
+	for i, v in ipairs( collection ) do
+		local st = mat4( scene.transform )
+		local m = mat4( st * mat4( vec3( v.x, v.y, v.z ), vec3( unit, unit, unit ), quat() ) )
+		table.insert( cube_transforms, m )
+		table.insert( cube_colors, { v.r, v.g, v.b, 1 } )
+	end
+
+	if #cube_transforms > 0 then
+		gpu_transforms_buf:setData( cube_transforms, 1, 1, #cube_transforms )
+		gpu_colors_buf:setData( cube_colors, 1, 1, #cube_colors )
+	end
 end

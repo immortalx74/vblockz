@@ -116,10 +116,12 @@ function lovr.draw( pass )
 	local ui_passes = Render.UI( pass )
 
 	pass:transform( scene.transform )
+
+	FillBuffers()
 	ShaderSend( pass )
 
-	Render.Axis( pass )
 	Render.Geometry( pass )
+	Render.Axis( pass )
 	Render.Cursor( pass )
 	Render.ReferenceModel( pass )
 	Render.Grid( pass )

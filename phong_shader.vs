@@ -1,5 +1,9 @@
-    vec4 lovrmain()
+    layout(set = 2, binding = 0) buffer CubeTransforms { mat4 cube_transforms[]; };
+	layout(set = 2, binding = 1) buffer CubeColors { vec4 cube_colors[]; };
+	layout(location = 3) out vec4 instance_color;
+	
+	vec4 lovrmain()
     {
-		PointSize = 10.0f;
-        return Projection * View * Transform * VertexPosition;
+		instance_color = cube_colors[InstanceIndex];
+        return Projection * View * cube_transforms[InstanceIndex] * VertexPosition;
     }
