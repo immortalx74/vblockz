@@ -6,11 +6,10 @@ function Render.Geometry( pass )
 	local count = #collection
 	pass:draw( mdl_cube, mat4(), nil, true, count )
 
-	for i, v in ipairs( volume.temp_storage ) do
-		pass:setColor( v.r, v.g, v.b )
-		pass:box( v.x, v.y, v.z, unit, unit, unit )
-		pass:setColor( 0, 0, 0 )
-		pass:box( v.x, v.y, v.z, unit, unit, unit, 0, 0, 0, 0, "line" )
+	if volume.state == e_volume_state.dragging then
+		pass:setShader()
+		pass:setColor( 1, 0, 0 )
+		pass:box( volume.x, volume.y, volume.z, volume.w, volume.h, volume.d )
 	end
 end
 

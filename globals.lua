@@ -6,10 +6,16 @@ e_tool = {
 	volume = 5
 }
 
+e_volume_state = {
+	started = 1,
+	dragging = 2,
+	finished = 3
+}
+
 scene = { transform = lovr.math.newMat4( vec3( 0, 0.5, -0.3 ) ), offset = lovr.math.newMat4(), last_transform = lovr.math.newMat4(), scale = 0.03, old_distance = 0 }
 scene.transform:scale( scene.scale )
 cur_tool = e_tool.draw
-volume = { start_cell = lovr.math.newVec3(), temp_storage = {} }
+volume = { start_cell = lovr.math.newVec3(), state = e_volume_state.finished }
 unit = 1
 collection = {}
 cursor = { center = lovr.math.newVec3(), cell = lovr.math.newVec3(), unsnapped = lovr.math.newVec3() }
@@ -20,7 +26,7 @@ help_window_open = false
 ref_model_load_window_open = false
 
 win_transform = lovr.math.newMat4( 0, 1.4, -1 )
-hand = "hand/left"
+hand = "hand/right"
 interaction_enabled = true
 wireframe = false
 show_grid = true
@@ -41,8 +47,8 @@ grid_shader = lovr.graphics.newShader( vs, fs, { flags = { highp = true } } )
 
 cube_transforms = {}
 cube_colors = {}
-gpu_transforms_buf = lovr.graphics.newBuffer( 40000, "mat4" )
-gpu_colors_buf = lovr.graphics.newBuffer( 40000, "vec4" )
+gpu_transforms_buf = lovr.graphics.newBuffer( 6000, "mat4" )
+gpu_colors_buf = lovr.graphics.newBuffer( 6000, "vec4" )
 
 function SetCursor()
 	local pt = mat4( scene.transform )

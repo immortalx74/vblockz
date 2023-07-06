@@ -83,13 +83,13 @@ function lovr.update( dt )
 
 	if lovr.headset.wasPressed( hand, "trigger" ) and not interaction_enabled then
 		if cur_tool == e_tool.volume then
-			volume.start_cell:set( cursor.cell )
+			Tool.Volume( e_volume_state.started, cursor.cell )
 		end
 	end
 
 	if lovr.headset.wasReleased( hand, "trigger" ) and not interaction_enabled then
 		if cur_tool == e_tool.volume then
-			Tool.Volume( true )
+			Tool.Volume( e_volume_state.finished )
 		end
 	end
 
@@ -107,7 +107,7 @@ function lovr.update( dt )
 			Tool.EyeDropper()
 		end
 		if cur_tool == e_tool.volume then
-			Tool.Volume( false )
+			Tool.Volume( e_volume_state.dragging )
 		end
 	end
 end

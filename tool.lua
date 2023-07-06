@@ -59,26 +59,13 @@ function Tool.EyeDropper()
 	end
 end
 
-function Tool.Volume( finished )
-	if finished then
-		-- store here
-		for i, v in ipairs( volume.temp_storage ) do
-			local free = true
+function Tool.Volume( state, cell )
+	volume.state = state
+	if state == e_volume_state.started then
+		volume.start_cell:set( cell )
+	end
 
-			for j, k in ipairs( collection ) do
-				if v.cell_x == k.cell_x and v.cell_y == k.cell_y and v.cell_z == k.cell_z then
-					free = false
-					break
-				end
-			end
-
-			if free then
-				table.insert( collection, v )
-			end
-		end
-		volume.temp_storage = {}
-		volume.start_cell:set( 0, 0, 0 )
-	else
+	if state == e_volume_state.dragging then
 		local max_x = math.max( volume.start_cell.x, cursor.cell.x )
 		local min_x = math.min( volume.start_cell.x, cursor.cell.x )
 		local max_y = math.max( volume.start_cell.y, cursor.cell.y )
@@ -90,11 +77,26 @@ function Tool.Volume( finished )
 		local span_y = max_y - min_y
 		local span_z = max_z - min_z
 
-		volume.temp_storage = {}
+		volume.x = ((min_x + max_x) / 2) + 0.5
+		volume.y = ((min_y + max_y) / 2) + 0.5
+		volume.z = ((min_z + max_z) / 2) + 0.5
+		volume.w = span_x + 1
+		volume.h = span_y + 1
+		volume.d = span_z + 1
+	end
 
-		for xx = min_x, min_x + span_x, 1 do
-			for yy = min_y, min_y + span_y, 1 do
-				for zz = min_z, min_z + span_z, 1 do
+	if state == e_volume_state.finished then
+		local start_cell_x = volume.x - (volume.w / 2)
+		local start_cell_y = volume.y - (volume.h / 2)
+		local start_cell_z = volume.z - (volume.d / 2)
+		local end_cell_x = start_cell_x + (volume.w - 1)
+		local end_cell_y = start_cell_y + (volume.h - 1)
+		local end_cell_z = start_cell_z + (volume.d - 1)
+
+		local temp = {}
+		for xx = start_cell_x, end_cell_x, 1 do
+			for yy = start_cell_y, end_cell_y, 1 do
+				for zz = start_cell_z, end_cell_z, 1 do
 					local t = {
 						x = xx + 0.5,
 						y = yy + 0.5,
@@ -106,8 +108,24 @@ function Tool.Volume( finished )
 						g = cur_color[ 2 ],
 						b = cur_color[ 3 ]
 					}
-					table.insert( volume.temp_storage, t )
+					table.insert( temp, t )
 				end
+			end
+		end
+
+
+		for i, v in ipairs( temp ) do
+			local free = true
+
+			for j, k in ipairs( collection ) do
+				if v.cell_x == k.cell_x and v.cell_y == k.cell_y and v.cell_z == k.cell_z then
+					free = false
+					break
+				end
+			end
+
+			if free then
+				table.insert( collection, v )
 			end
 		end
 	end
