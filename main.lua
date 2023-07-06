@@ -118,13 +118,13 @@ function lovr.draw( pass )
 	pass:transform( scene.transform )
 
 	FillBuffers()
-	ShaderSend( pass )
-
-	Render.Geometry( pass )
 	Render.Axis( pass )
 	Render.Cursor( pass )
 	Render.ReferenceModel( pass )
 	Render.Grid( pass )
+
+	ShaderSend( pass )
+	Render.Geometry( pass )
 
 	table.insert( ui_passes, pass )
 	return lovr.graphics.submit( ui_passes )

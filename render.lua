@@ -3,8 +3,12 @@ require "globals"
 local Render = {}
 
 function Render.Geometry( pass )
+	local mdl = mdl_cube
+	if wireframe then
+		mdl = mdl_cube_wire
+	end
 	local count = #collection
-	pass:draw( mdl_cube, mat4(), nil, true, count )
+	pass:draw( mdl, mat4(), nil, true, count )
 
 	if volume.state == e_volume_state.dragging then
 		pass:setShader()
@@ -69,12 +73,13 @@ end
 function Render.UI( pass )
 	UI.NewFrame( pass )
 	UI.Begin( "FirstWindow", win_transform )
-	UI.Label( tostring( #collection ) )
 	local button_bg_color = UI.GetColor( "button_bg" )
-
+	
 	if UI.Button( "?" ) then
 		help_window_open = true
 	end
+	UI.Label( "Instance count: " .. tostring( #collection ) )
+
 	if cur_tool == e_tool.draw then UI.OverrideColor( "button_bg", active_tool_color ) end
 	if UI.Button( "Draw" ) then
 		cur_tool = e_tool.draw

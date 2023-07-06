@@ -37,6 +37,7 @@ ref_model_alpha = 1
 ref_model_scale = 1
 active_tool_color = { 0.3, 0.3, 1 }
 mdl_cube = lovr.graphics.newModel( "cube.glb" )
+mdl_cube_wire = lovr.graphics.newModel( "cube_wire.glb" )
 
 local vs = lovr.filesystem.read( "phong_shader.vs" )
 local fs = lovr.filesystem.read( "phong_shader.fs" )
