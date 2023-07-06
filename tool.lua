@@ -34,7 +34,6 @@ function Tool.Erase()
 	for i = count, 1, -1 do
 		if cursor.cell.x == collection[ i ].cell_x and cursor.cell.y == collection[ i ].cell_y and cursor.cell.z == collection[ i ].cell_z then
 			table.remove( collection, i )
-			print( i )
 		end
 	end
 end

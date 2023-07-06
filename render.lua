@@ -59,7 +59,7 @@ end
 
 function Render.ReferenceModel( pass )
 	if ref_model and show_ref_model then
-		-- pass:setShader()
+		pass:setShader( phong_shader )
 		pass:setColor( 1, 1, 1, ref_model_alpha )
 		pass:draw( ref_model, 0, 0, 0, ref_model_scale )
 		pass:setColor( 1, 1, 1, 1 )
