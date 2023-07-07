@@ -184,7 +184,14 @@ function Render.UI( pass )
 	-- Load ref model modal window
 	if ref_model_load_window_open then
 		local m = mat4( win_transform ):translate( 0, 0, 0.01 )
+		local path = ""
+		if lovr.filesystem.isFused() then
+			path = lovr.filesystem.getExecutablePath()
+			path = path:sub( 1, -12 ) --"vblockz.exe"
+			lovr.filesystem.mount( path .. "ref", "ref" )
+		end
 		UI.Begin( "load_ref_model", m, true )
+		UI.Label("path: " .. path)
 		local files = lovr.filesystem.getDirectoryItems( "ref" )
 		local _, idx = UI.ListBox( "files", 10, 21, files, 1 )
 
