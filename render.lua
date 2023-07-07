@@ -74,7 +74,7 @@ function Render.UI( pass )
 	UI.NewFrame( pass )
 	UI.Begin( "FirstWindow", win_transform )
 	local button_bg_color = UI.GetColor( "button_bg" )
-	
+
 	if UI.Button( "?" ) then
 		help_window_open = true
 	end
@@ -155,6 +155,8 @@ function Render.UI( pass )
 		if #collection > 0 then
 			OBJ.Save( export_filename )
 		end
+
+		file_exported_window_open = true
 	end
 
 	UI.End( pass )
@@ -196,6 +198,22 @@ function Render.UI( pass )
 			collectgarbage( "collect" )
 			ref_model = lovr.graphics.newModel( "ref/" .. files[ idx ] )
 			ref_model_load_window_open = fasle
+			UI.EndModalWindow()
+		end
+
+		UI.End( pass )
+	end
+
+	-- File exported modal window
+	if file_exported_window_open then
+		local m = mat4( win_transform ):translate( 0, 0, 0.01 )
+		UI.Begin( "file_exported", m, true )
+		local dir = lovr.filesystem.getSaveDirectory()
+		UI.Label( "File exported to:" )
+		UI.Label( dir )
+
+		if UI.Button( "OK" ) then
+			file_exported_window_open = fasle
 			UI.EndModalWindow()
 		end
 

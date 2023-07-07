@@ -24,6 +24,7 @@ unique_colors = {}
 export_filename = "mymodel"
 help_window_open = false
 ref_model_load_window_open = false
+file_exported_window_open = false
 
 win_transform = lovr.math.newMat4( 0, 1.4, -1 )
 hand = "hand/right"
