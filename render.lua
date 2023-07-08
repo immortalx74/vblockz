@@ -8,7 +8,9 @@ function Render.Geometry( pass )
 		mdl = mdl_cube_wire
 	end
 	local count = #collection
-	pass:draw( mdl, mat4(), nil, true, count )
+	if count > 0 then
+		pass:draw( mdl, mat4(), nil, true, count )
+	end
 
 	if volume.state == e_volume_state.dragging then
 		pass:setShader()
@@ -44,7 +46,16 @@ function Render.Cursor( pass )
 			pass:setShader()
 			local q = quat( scene.transform )
 			local m = mat4( vec3( cursor.unsnapped.x, cursor.unsnapped.y, cursor.unsnapped.z ) ):rotate( q:conjugate() ):translate( 4, 0, 0 )
+
+			pass:setColor( 0.05, 0.05, 0.05 )
+			local label = mat4( m ):translate( 0, 0, -0.001 )
+			local w = font:getWidth( cur_tool_label )
+			pass:plane( vec3( label ), vec2( w + 0.3, 1 ), quat( label ) )
+			pass:setColor( 0.6, 0.6, 0.6 )
+
 			pass:text( cur_tool_label, m )
+			pass:setColor( 0,0,0 )
+			pass:line( cursor.center.x, cursor.center.y, cursor.center.z, vec3( m ):unpack() )
 		end
 	end
 end
@@ -146,7 +157,7 @@ function Render.UI( pass )
 
 	local _
 	_, ref_model_alpha = UI.SliderFloat( "Reference model alpha", ref_model_alpha, 0, 1, 840, 3 )
-	_, ref_model_scale = UI.SliderFloat( "Reference model scale", ref_model_scale, 0, 4, 840, 3 )
+	_, ref_model_scale = UI.SliderFloat( "Reference model scale", ref_model_scale, 0, 100, 840, 3 )
 
 	local _, _, _, buf = UI.TextBox( "filename", 21, export_filename )
 	UI.SameLine()
@@ -191,7 +202,7 @@ function Render.UI( pass )
 			lovr.filesystem.mount( path .. "ref", "ref" )
 		end
 		UI.Begin( "load_ref_model", m, true )
-		UI.Label("path: " .. path)
+		UI.Label( "path: " .. path )
 		local files = lovr.filesystem.getDirectoryItems( "ref" )
 		local _, idx = UI.ListBox( "files", 10, 21, files, 1 )
 

@@ -49,6 +49,7 @@ phong_shader_instanced = lovr.graphics.newShader( vs, fs )
 local vs = lovr.filesystem.read( "grid_shader.vs" )
 local fs = lovr.filesystem.read( "grid_shader.fs" )
 grid_shader = lovr.graphics.newShader( vs, fs, { flags = { highp = true } } )
+font = lovr.graphics.getDefaultFont()
 
 cube_transforms = {}
 cube_colors = {}
