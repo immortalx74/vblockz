@@ -1,9 +1,12 @@
+local Json = require "json"
+
 e_tool = {
 	draw = 1,
 	erase = 2,
 	paint = 3,
 	eydropper = 4,
-	volume = 5
+	volume = 5,
+	append = 6
 }
 
 e_volume_state = {
@@ -16,8 +19,9 @@ scene = { transform = lovr.math.newMat4( vec3( 0, 0.5, -0.3 ) ), offset = lovr.m
 scene.transform:scale( scene.scale )
 cur_tool = e_tool.draw
 volume = { start_cell = lovr.math.newVec3(), state = e_volume_state.finished }
-unit = 1
+unit =0.5
 collection = {}
+append = {}
 cursor = { center = lovr.math.newVec3(), cell = lovr.math.newVec3(), unsnapped = lovr.math.newVec3() }
 cur_color = { 1, 1, 0 }
 unique_colors = {}
@@ -25,9 +29,12 @@ export_filename = "mymodel"
 help_window_open = false
 ref_model_load_window_open = false
 file_exported_window_open = false
+append_window_open = false
+load_window_open = false
+append_model = nil
 
 win_transform = lovr.math.newMat4( 0, 1.4, -1 )
-hand = "hand/right"
+hand = "hand/left"
 interaction_enabled = true
 wireframe = false
 show_grid = true
@@ -39,6 +46,8 @@ ref_model_scale = 1
 active_tool_color = { 0.3, 0.3, 1 }
 mdl_cube = lovr.graphics.newModel( "cube.glb" )
 mdl_cube_wire = lovr.graphics.newModel( "cube_wire.glb" )
+img_color_spectrum = lovr.data.newImage( "spectrum_chart.png" )
+tex_color_spectrum = lovr.graphics.newTexture( img_color_spectrum )
 
 local vs = lovr.filesystem.read( "phong_shader.vs" )
 local fs = lovr.filesystem.read( "phong_shader.fs" )
@@ -53,8 +62,8 @@ font = lovr.graphics.getDefaultFont()
 
 cube_transforms = {}
 cube_colors = {}
-gpu_transforms_buf = lovr.graphics.newBuffer( 6000, "mat4" )
-gpu_colors_buf = lovr.graphics.newBuffer( 6000, "vec4" )
+gpu_transforms_buf = lovr.graphics.newBuffer( 200000, "mat4" )
+gpu_colors_buf = lovr.graphics.newBuffer( 200000, "vec4" )
 
 function SetCursor()
 	local pt = mat4( scene.transform )
@@ -77,6 +86,7 @@ function UpdateToolLabel()
 	if cur_tool == e_tool.paint then cur_tool_label = "Paint" end
 	if cur_tool == e_tool.eydropper then cur_tool_label = "EyeDropper" end
 	if cur_tool == e_tool.volume then cur_tool_label = "Volume" end
+	if cur_tool == e_tool.append then cur_tool_label = "Append" end
 end
 
 function MapRange( from_min, from_max, to_min, to_max, v )
@@ -109,4 +119,18 @@ function FillBuffers()
 		gpu_transforms_buf:setData( cube_transforms, 1, 1, #cube_transforms )
 		gpu_colors_buf:setData( cube_colors, 1, 1, #cube_colors )
 	end
+
+	-- if cur_tool == e_tool.append then
+	-- 	for i, v in ipairs( append ) do
+	-- 		local st = mat4( scene.transform )
+	-- 		local m = mat4( st * mat4( vec3( v.x, v.y, v.z ), vec3( unit, unit, unit ), quat() ) )
+	-- 		table.insert( cube_transforms, m )
+	-- 		table.insert( cube_colors, { v.r, v.g, v.b, 1 } )
+	-- 	end
+
+	-- 	if #cube_transforms > 0 then
+	-- 		gpu_transforms_buf:setData( cube_transforms, 1, 1, #cube_transforms )
+	-- 		gpu_colors_buf:setData( cube_colors, 1, 1, #cube_colors )
+	-- 	end
+	-- end
 end

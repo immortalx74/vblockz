@@ -1,3 +1,5 @@
 .vscode
 conf.lua
 release
+*.vblockz
+*.glb

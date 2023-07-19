@@ -130,4 +130,23 @@ function Tool.Volume( state, cell )
 	end
 end
 
+function Tool.Append( insert )
+	if insert then
+		append = {}
+		local file = io.open( append_model, "rb" )
+		local str = file:read( "*all" )
+		append = Json.decode( str )
+		file:close()
+		for i, v in ipairs( append ) do
+			v.x = v.x + cursor.cell.x
+			v.y = v.y + cursor.cell.y
+			v.z = v.z + cursor.cell.z + 1
+			v.cell_x = v.cell_x + cursor.cell.x
+			v.cell_y = v.cell_y + cursor.cell.y
+			v.cell_z = v.cell_z + cursor.cell.z
+			table.insert( collection, append[ i ] )
+		end
+	end
+end
+
 return Tool

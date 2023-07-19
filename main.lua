@@ -3,6 +3,7 @@ UI = require "ui/ui"
 OBJ = require "obj"
 Render = require "render"
 Tool = require "tool"
+Json = require "json"
 
 function lovr.load()
 	UI.Init()
@@ -84,6 +85,9 @@ function lovr.update( dt )
 	if lovr.headset.wasPressed( hand, "trigger" ) and not interaction_enabled then
 		if cur_tool == e_tool.volume then
 			Tool.Volume( e_volume_state.started, cursor.cell )
+		end
+		if cur_tool == e_tool.append then
+			Tool.Append( true )
 		end
 	end
 

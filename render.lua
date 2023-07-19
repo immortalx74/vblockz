@@ -1,4 +1,5 @@
 require "globals"
+local Json = require "json"
 
 local Render = {}
 
@@ -11,6 +12,11 @@ function Render.Geometry( pass )
 	if count > 0 then
 		pass:draw( mdl, mat4(), nil, true, count )
 	end
+
+	-- local count = #append
+	-- if count > 0 then
+	-- 	pass:draw( mdl, mat4(), nil, true, count )
+	-- end
 
 	if volume.state == e_volume_state.dragging then
 		pass:setShader()
@@ -54,7 +60,7 @@ function Render.Cursor( pass )
 			pass:setColor( 0.6, 0.6, 0.6 )
 
 			pass:text( cur_tool_label, m )
-			pass:setColor( 0,0,0 )
+			pass:setColor( 0, 0, 0 )
 			pass:line( cursor.center.x, cursor.center.y, cursor.center.z, vec3( m ):unpack() )
 		end
 	end
@@ -86,9 +92,52 @@ function Render.UI( pass )
 	UI.Begin( "FirstWindow", win_transform )
 	local button_bg_color = UI.GetColor( "button_bg" )
 
+	if UI.Button( "New" ) then
+		collection = {}
+	end
+	UI.SameLine()
+	if UI.Button( "Load" ) then
+		load_window_open = true
+	end
+	UI.SameLine()
+	if UI.Button( "Save" ) then
+		local voxels_out = {}
+		for i, v in ipairs( collection ) do
+			local t = {
+				x = v.x,
+				y = v.y,
+				z = v.z,
+				cell_x = v.cell_x,
+				cell_y = v.cell_y,
+				cell_z = v.cell_z,
+				r = v.r,
+				g = v.g,
+				b = v.b
+			}
+			table.insert( voxels_out, t )
+		end
+		local out = Json.encode( voxels_out )
+		if lovr.filesystem.isFused() then
+			lovr.filesystem.write( export_filename .. ".vblockz", out )
+		else
+			local file = io.open( "models/" .. export_filename .. ".vblockz", "wb" )
+			file:write( out )
+			file:close()
+		end
+	end
+
+	UI.SameLine()
+
+	if UI.Button( "Append" ) then
+		append_window_open = true
+	end
+
+	UI.SameLine()
+
 	if UI.Button( "?" ) then
 		help_window_open = true
 	end
+
 	UI.Label( "Instance count: " .. tostring( #collection ) )
 
 	if cur_tool == e_tool.draw then UI.OverrideColor( "button_bg", active_tool_color ) end
@@ -138,6 +187,16 @@ function Render.UI( pass )
 	UI.SameColumn()
 	_, cur_color[ 3 ] = UI.SliderFloat( "B", cur_color[ 3 ], 0, 1, 600, 3 )
 
+	local ps, clicked, down, released, hovered, lx, ly = UI.WhiteBoard( "color_samplee", 852, 551 )
+	ps:setColor( 1, 1, 1 )
+	ps:setMaterial( tex_color_spectrum )
+	ps:fill()
+	if down then
+		local r, g, b, a = img_color_spectrum:getPixel( lx, ly )
+		cur_color = { r, g, b }
+	end
+
+
 	if UI.CheckBox( "wireframe", wireframe ) then
 		wireframe = not wireframe
 	end
@@ -160,9 +219,9 @@ function Render.UI( pass )
 	_, ref_model_scale = UI.SliderFloat( "Reference model scale", ref_model_scale, 0, 100, 840, 3 )
 
 	local _, _, _, buf = UI.TextBox( "filename", 21, export_filename )
+	export_filename = buf
 	UI.SameLine()
 	if UI.Button( "Export obj" ) then
-		export_filename = buf
 		if #collection > 0 then
 			OBJ.Save( export_filename )
 		end
@@ -215,6 +274,7 @@ function Render.UI( pass )
 			ref_model = nil
 			collectgarbage( "collect" )
 			ref_model = lovr.graphics.newModel( "ref/" .. files[ idx ] )
+			lovr.timer.sleep( 2 )
 			ref_model_load_window_open = fasle
 			UI.EndModalWindow()
 		end
@@ -237,6 +297,70 @@ function Render.UI( pass )
 
 		UI.End( pass )
 	end
+
+	-- Append modal window
+	if append_window_open then
+		local m = mat4( win_transform ):translate( 0, 0, 0.01 )
+		local path = ""
+		if lovr.filesystem.isFused() then
+			path = lovr.filesystem.getExecutablePath()
+			path = path:sub( 1, -12 ) --"vblockz.exe"
+			lovr.filesystem.mount( path .. "ref", "ref" )
+		end
+		UI.Begin( "append_model", m, true )
+		UI.Label( "path: " .. path )
+		local files = lovr.filesystem.getDirectoryItems( "models" )
+		local _, idx = UI.ListBox( "files", 10, 21, files, 1 )
+
+		if UI.Button( "Cancel" ) then
+			append_window_open = fasle
+			UI.EndModalWindow()
+		end
+
+		if UI.Button( "OK" ) then
+			append = {}
+			append_model = "models/" .. files[ idx ]
+
+			cur_tool = e_tool.append
+			append_window_open = fasle
+			UI.EndModalWindow()
+		end
+
+		UI.End( pass )
+	end
+
+	-- Load modal window
+	if load_window_open then
+		local m = mat4( win_transform ):translate( 0, 0, 0.01 )
+		local path = ""
+		if lovr.filesystem.isFused() then
+			path = lovr.filesystem.getExecutablePath()
+			path = path:sub( 1, -12 ) --"vblockz.exe"
+			lovr.filesystem.mount( path .. "ref", "ref" )
+		end
+		UI.Begin( "load_model", m, true )
+		UI.Label( "path: " .. path )
+		local files = lovr.filesystem.getDirectoryItems( "models" )
+		local _, idx = UI.ListBox( "files", 10, 21, files, 1 )
+
+		if UI.Button( "Cancel" ) then
+			load_window_open = fasle
+			UI.EndModalWindow()
+		end
+
+		if UI.Button( "OK" ) then
+			collection = {}
+			local file = io.open( "models/" .. files[ idx ] )
+			local str = file:read( "*all" )
+			collection = Json.decode( str )
+			file:close()
+			load_window_open = fasle
+			UI.EndModalWindow()
+		end
+
+		UI.End( pass )
+	end
+
 	return UI.RenderFrame( pass )
 end
 
