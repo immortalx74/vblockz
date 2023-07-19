@@ -8,15 +8,14 @@ function Render.Geometry( pass )
 	if wireframe then
 		mdl = mdl_cube_wire
 	end
-	local count = #collection
-	if count > 0 then
-		pass:draw( mdl, mat4(), nil, true, count )
-	end
 
-	-- local count = #append
-	-- if count > 0 then
-	-- 	pass:draw( mdl, mat4(), nil, true, count )
-	-- end
+	local count1 = #collection
+	local count2 = #append
+	local total = #collection + #append
+
+	if total > 0 then
+		pass:draw( mdl, mat4(), nil, true, total )
+	end
 
 	if volume.state == e_volume_state.dragging then
 		pass:setShader()
@@ -33,7 +32,7 @@ function Render.Grid( pass )
 end
 
 function Render.Cursor( pass )
-	if not interaction_enabled then
+	if not interaction_enabled and cur_tool ~= e_tool.volume then
 		-- Cursor
 		pass:setShader()
 
@@ -318,8 +317,14 @@ function Render.UI( pass )
 		end
 
 		if UI.Button( "OK" ) then
-			append = {}
 			append_model = "models/" .. files[ idx ]
+
+			append = {}
+			append_preview = {}
+			local file = io.open( append_model, "rb" )
+			local str = file:read( "*all" )
+			append_preview = Json.decode( str )
+			file:close()
 
 			cur_tool = e_tool.append
 			append_window_open = fasle

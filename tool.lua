@@ -132,19 +132,24 @@ end
 
 function Tool.Append( insert )
 	if insert then
-		append = {}
-		local file = io.open( append_model, "rb" )
-		local str = file:read( "*all" )
-		append = Json.decode( str )
-		file:close()
 		for i, v in ipairs( append ) do
-			v.x = v.x + cursor.cell.x
-			v.y = v.y + cursor.cell.y
-			v.z = v.z + cursor.cell.z + 1
-			v.cell_x = v.cell_x + cursor.cell.x
-			v.cell_y = v.cell_y + cursor.cell.y
-			v.cell_z = v.cell_z + cursor.cell.z
 			table.insert( collection, append[ i ] )
+		end
+	else
+		append = {}
+		for i, v in ipairs( append_preview ) do
+			local t = {
+				x = v.x + cursor.cell.x,
+				y = v.y + cursor.cell.y,
+				z = v.z + cursor.cell.z + 1,
+				cell_x = v.cell_x + cursor.cell.x,
+				cell_y = v.cell_y + cursor.cell.y,
+				cell_z = v.cell_z + cursor.cell.z,
+				r = v.r,
+				g = v.g,
+				b = v.b
+			}
+			table.insert( append, t )
 		end
 	end
 end

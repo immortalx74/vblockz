@@ -19,9 +19,10 @@ scene = { transform = lovr.math.newMat4( vec3( 0, 0.5, -0.3 ) ), offset = lovr.m
 scene.transform:scale( scene.scale )
 cur_tool = e_tool.draw
 volume = { start_cell = lovr.math.newVec3(), state = e_volume_state.finished }
-unit =0.5
+unit = 1
 collection = {}
 append = {}
+append_preview = {}
 cursor = { center = lovr.math.newVec3(), cell = lovr.math.newVec3(), unsnapped = lovr.math.newVec3() }
 cur_color = { 1, 1, 0 }
 unique_colors = {}
@@ -34,7 +35,7 @@ load_window_open = false
 append_model = nil
 
 win_transform = lovr.math.newMat4( 0, 1.4, -1 )
-hand = "hand/left"
+hand = "hand/right"
 interaction_enabled = true
 wireframe = false
 show_grid = true
@@ -108,6 +109,7 @@ end
 function FillBuffers()
 	cube_transforms = {}
 	cube_colors = {}
+
 	for i, v in ipairs( collection ) do
 		local st = mat4( scene.transform )
 		local m = mat4( st * mat4( vec3( v.x, v.y, v.z ), vec3( unit, unit, unit ), quat() ) )
@@ -115,22 +117,17 @@ function FillBuffers()
 		table.insert( cube_colors, { v.r, v.g, v.b, 1 } )
 	end
 
+	if cur_tool == e_tool.append then
+		for i, v in ipairs( append ) do
+			local st = mat4( scene.transform )
+			local m = mat4( st * mat4( vec3( v.x, v.y, v.z ), vec3( unit, unit, unit ), quat() ) )
+			table.insert( cube_transforms, m )
+			table.insert( cube_colors, { v.r, v.g, v.b, 1 } )
+		end
+	end
+
 	if #cube_transforms > 0 then
 		gpu_transforms_buf:setData( cube_transforms, 1, 1, #cube_transforms )
 		gpu_colors_buf:setData( cube_colors, 1, 1, #cube_colors )
 	end
-
-	-- if cur_tool == e_tool.append then
-	-- 	for i, v in ipairs( append ) do
-	-- 		local st = mat4( scene.transform )
-	-- 		local m = mat4( st * mat4( vec3( v.x, v.y, v.z ), vec3( unit, unit, unit ), quat() ) )
-	-- 		table.insert( cube_transforms, m )
-	-- 		table.insert( cube_colors, { v.r, v.g, v.b, 1 } )
-	-- 	end
-
-	-- 	if #cube_transforms > 0 then
-	-- 		gpu_transforms_buf:setData( cube_transforms, 1, 1, #cube_transforms )
-	-- 		gpu_colors_buf:setData( cube_colors, 1, 1, #cube_colors )
-	-- 	end
-	-- end
 end

@@ -91,6 +91,13 @@ function lovr.update( dt )
 		end
 	end
 
+	if cur_tool == e_tool.append then
+		Tool.Append( false )
+	else
+		append = {}
+		append_preview = {}
+	end
+
 	if lovr.headset.wasReleased( hand, "trigger" ) and not interaction_enabled then
 		if cur_tool == e_tool.volume then
 			Tool.Volume( e_volume_state.finished )
