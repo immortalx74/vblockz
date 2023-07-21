@@ -7,7 +7,8 @@ Constants
 	int metallic;
 };
 
-layout(location = 3) in vec4 instance_color;
+// layout(location = 2) in vec4 instance_color;
+in vec4 instance_color;
 
 vec4 lovrmain()
 {
@@ -26,6 +27,7 @@ vec4 lovrmain()
 	vec4 specular = specularStrength * spec * lightColor;
 
 	//vec4 baseColor = Color * getPixel(ColorTexture, UV);
-	vec4 baseColor = instance_color * getPixel(ColorTexture, UV);
+	// vec4 baseColor = instance_color * getPixel(ColorTexture, UV);
+	vec4 baseColor = instance_color;
 	return baseColor * (ambience + diffuse + specular);
 }

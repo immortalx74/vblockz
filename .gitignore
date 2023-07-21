@@ -3,3 +3,6 @@ conf.lua
 release
 *.vblockz
 *.glb
+*.obj
+*.png
+*.mtl

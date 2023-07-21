@@ -9,8 +9,6 @@ function Render.Geometry( pass )
 		mdl = mdl_cube_wire
 	end
 
-	local count1 = #collection
-	local count2 = #append
 	local total = #collection + #append
 
 	if total > 0 then
@@ -32,7 +30,7 @@ function Render.Grid( pass )
 end
 
 function Render.Cursor( pass )
-	if not interaction_enabled and cur_tool ~= e_tool.volume then
+	if not interaction_enabled and cur_tool ~= e_tool.append then
 		-- Cursor
 		pass:setShader()
 
@@ -195,6 +193,27 @@ function Render.UI( pass )
 		cur_color = { r, g, b }
 	end
 
+	UI.Label( "Rotate 90" )
+	if UI.Button( "X" ) then
+		for i, v in ipairs( append_preview ) do
+			v.y, v.z = -v.z, v.y
+			v.cell_y, v.cell_z = -v.cell_z, v.cell_y
+		end
+	end
+	UI.SameLine()
+	if UI.Button( "Y" ) then
+		for i, v in ipairs( append_preview ) do
+			v.x, v.z = -v.z, v.x
+			v.cell_x, v.cell_z = -v.cell_z, v.cell_x
+		end
+	end
+	UI.SameLine()
+	if UI.Button( "Z" ) then
+		for i, v in ipairs( append_preview ) do
+			v.x, v.y = -v.y, v.x
+			v.cell_x, v.cell_y = -v.cell_y, v.cell_x
+		end
+	end
 
 	if UI.CheckBox( "wireframe", wireframe ) then
 		wireframe = not wireframe
@@ -285,9 +304,7 @@ function Render.UI( pass )
 	if file_exported_window_open then
 		local m = mat4( win_transform ):translate( 0, 0, 0.01 )
 		UI.Begin( "file_exported", m, true )
-		local dir = lovr.filesystem.getSaveDirectory()
-		UI.Label( "File exported to:" )
-		UI.Label( dir )
+		UI.Label( "File exported successfully" )
 
 		if UI.Button( "OK" ) then
 			file_exported_window_open = fasle

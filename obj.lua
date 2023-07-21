@@ -66,7 +66,10 @@ function OBJ.WriteVertexInfo( filename )
 		output = output .. "v " .. " " .. tl2[ 1 ] .. " " .. tl2[ 2 ] .. " " .. tl2[ 3 ] .. "\n"
 	end
 
-	lovr.filesystem.write( filename .. ".obj", output )
+	-- lovr.filesystem.write( filename .. ".obj", output )
+	local file = io.open( "export/" .. filename .. ".obj", "wb" )
+	file:write( output )
+	file:close()
 	output = ""
 end
 
@@ -94,7 +97,20 @@ function OBJ.WriteFaceInfo( filename )
 		interv = interv + 8
 	end
 
-	lovr.filesystem.append( filename .. ".obj", output )
+	local file = io.open( "export/" .. filename .. ".obj", "ab" )
+	file:write( output )
+	file:close()
+	-- lovr.filesystem.append( filename .. ".obj", output )
+end
+
+local function convertStringToByteArray( str )
+	local byteArray = {}
+	for i = 1, #str do
+		local c = string.sub( str, i, i )
+		table.insert( byteArray, string.byte( c ) )
+	end
+
+	return byteArray
 end
 
 function OBJ.WriteTextureFile( filename )
@@ -105,12 +121,20 @@ function OBJ.WriteTextureFile( filename )
 	end
 
 	local export_blob = img:encode()
-	lovr.filesystem.write( filename .. ".png", export_blob )
+
+	local file = io.open( "export/" .. filename .. ".png", "wb" )
+	local str = export_blob:getString()
+	file:write( str )
+	file:close()
 end
 
 function OBJ.WriteMaterialFile( filename )
 	local str = "newmtl Material\nmap_Kd " .. filename .. ".png"
-	lovr.filesystem.write( filename .. ".mtl", str )
+
+	local file = io.open( "export/" .. filename .. ".mtl", "wb" )
+	file:write( str )
+	file:close()
+	-- lovr.filesystem.write( filename .. ".mtl", str )
 end
 
 function OBJ.Save( filename )

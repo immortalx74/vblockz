@@ -14,7 +14,6 @@ function Tool.Draw()
 		g = cur_color[ 2 ],
 		b = cur_color[ 3 ]
 	}
-
 	local free = true
 	for i, v in ipairs( collection ) do
 		if cursor.cell.x == v.cell_x and cursor.cell.y == v.cell_y and cursor.cell.z == v.cell_z then
@@ -76,30 +75,32 @@ function Tool.Volume( state, cell )
 		local span_y = max_y - min_y
 		local span_z = max_z - min_z
 
-		volume.x = ((min_x + max_x) / 2) + 0.5
-		volume.y = ((min_y + max_y) / 2) + 0.5
-		volume.z = ((min_z + max_z) / 2) + 0.5
-		volume.w = span_x + 1
-		volume.h = span_y + 1
-		volume.d = span_z + 1
+		volume.x = (((min_x + max_x) * unit) / 2) + (unit / 2)
+		volume.y = (((min_y + max_y) * unit) / 2) + (unit / 2)
+		volume.z = (((min_z + max_z) * unit) / 2) + (unit / 2)
+		volume.w = (span_x + 1) * unit
+		volume.h = (span_y + 1) * unit
+		volume.d = (span_z + 1) * unit
 	end
 
 	if state == e_volume_state.finished then
-		local start_cell_x = volume.x - (volume.w / 2)
-		local start_cell_y = volume.y - (volume.h / 2)
-		local start_cell_z = volume.z - (volume.d / 2)
-		local end_cell_x = start_cell_x + (volume.w - 1)
-		local end_cell_y = start_cell_y + (volume.h - 1)
-		local end_cell_z = start_cell_z + (volume.d - 1)
+		local start_cell_x = (volume.x - (volume.w / 2)) / unit
+		local start_cell_y = (volume.y - (volume.h / 2)) / unit
+		local start_cell_z = (volume.z - (volume.d / 2)) / unit
+		local end_cell_x = start_cell_x + (volume.w / unit) - 1
+		local end_cell_y = start_cell_y + (volume.h / unit) - 1
+		local end_cell_z = start_cell_z + (volume.d / unit) - 1
+
+		print( start_cell_x, end_cell_x, volume.x, volume.w )
 
 		local temp = {}
 		for xx = start_cell_x, end_cell_x, 1 do
 			for yy = start_cell_y, end_cell_y, 1 do
 				for zz = start_cell_z, end_cell_z, 1 do
 					local t = {
-						x = xx + 0.5,
-						y = yy + 0.5,
-						z = zz + 0.5,
+						x = (xx * unit) + (unit / 2),
+						y = (yy * unit) + (unit / 2),
+						z = (zz * unit) + (unit / 2),
 						cell_x = xx,
 						cell_y = yy,
 						cell_z = zz,
@@ -111,7 +112,6 @@ function Tool.Volume( state, cell )
 				end
 			end
 		end
-
 
 		for i, v in ipairs( temp ) do
 			local free = true
@@ -135,21 +135,26 @@ function Tool.Append( insert )
 		for i, v in ipairs( append ) do
 			table.insert( collection, append[ i ] )
 		end
+		lovr.graphics.wait()
 	else
-		append = {}
-		for i, v in ipairs( append_preview ) do
-			local t = {
-				x = v.x + cursor.cell.x,
-				y = v.y + cursor.cell.y,
-				z = v.z + cursor.cell.z + 1,
-				cell_x = v.cell_x + cursor.cell.x,
-				cell_y = v.cell_y + cursor.cell.y,
-				cell_z = v.cell_z + cursor.cell.z,
-				r = v.r,
-				g = v.g,
-				b = v.b
-			}
-			table.insert( append, t )
+		if interaction_enabled then
+			append = {}
+		else
+			append = {}
+			for i, v in ipairs( append_preview ) do
+				local t = {
+					x = (v.x + cursor.center.x) - unit / 2,
+					y = (v.y + cursor.center.y) - unit / 2,
+					z = (v.z + cursor.center.z) - unit / 2,
+					cell_x = v.cell_x + cursor.cell.x,
+					cell_y = v.cell_y + cursor.cell.y,
+					cell_z = v.cell_z + cursor.cell.z,
+					r = v.r,
+					g = v.g,
+					b = v.b
+				}
+				table.insert( append, t )
+			end
 		end
 	end
 end
