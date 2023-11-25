@@ -27,7 +27,7 @@ function lovr.update( dt )
 	SetCursor()
 	UpdateToolLabel()
 
-	if UI.GetInteractionEnabled() then
+	if UI.IsInteractionEnabled() then
 		interaction_enabled = true
 	else
 		interaction_enabled = false

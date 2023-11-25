@@ -63,8 +63,9 @@ font = lovr.graphics.getDefaultFont()
 
 cube_transforms = {}
 cube_colors = {}
-gpu_transforms_buf = lovr.graphics.newBuffer( 200000, "mat4" )
-gpu_colors_buf = lovr.graphics.newBuffer( 200000, "vec4" )
+
+gpu_transforms_buf = lovr.graphics.newBuffer( "mat4", 200000 )
+gpu_colors_buf = lovr.graphics.newBuffer( "vec4", 200000 )
 
 function SetCursor()
 	local pt = mat4( scene.transform )
