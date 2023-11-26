@@ -10,11 +10,11 @@ function Render.Geometry( pass )
 	end
 
 	local total = #collection + #append
-	
+
 	if total > 0 then
-		pass:draw( mdl, mat4(), nil, total )
+		pass:draw( mdl, mat4(), total )
 	end
-	
+
 	if volume.state == e_volume_state.dragging then
 		pass:setShader()
 		pass:setColor( 1, 0, 0 )
