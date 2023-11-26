@@ -1666,6 +1666,8 @@ function UI.SliderInt( text, v, v_min, v_max, width )
 	local bbox = {}
 	if _.layout.same_line then
 		bbox = { x = _.layout.prev_x + _.layout.prev_w + _.margin, y = _.layout.prev_y, w = slider_w + _.margin + text_w, h = (2 * _.margin) + text_h }
+	elseif _.layout.same_column then
+		bbox = { x = _.layout.prev_x, y = _.layout.prev_y + _.layout.prev_h + _.margin, w = slider_w + _.margin + text_w, h = (2 * _.margin) + text_h  }
 	else
 		bbox = { x = _.margin, y = _.layout.prev_y + _.layout.row_h + _.margin, w = slider_w + _.margin + text_w, h = (2 * _.margin) + text_h }
 	end
@@ -1764,6 +1766,8 @@ function UI.SliderFloat( text, v, v_min, v_max, width, num_decimals )
 	local bbox = {}
 	if _.layout.same_line then
 		bbox = { x = _.layout.prev_x + _.layout.prev_w + _.margin, y = _.layout.prev_y, w = slider_w + _.margin + text_w, h = (2 * _.margin) + text_h }
+	elseif _.layout.same_column then
+		bbox = { x = _.layout.prev_x, y = _.layout.prev_y + _.layout.prev_h + _.margin, w = slider_w + _.margin + text_w, h = (2 * _.margin) + text_h  }
 	else
 		bbox = { x = _.margin, y = _.layout.prev_y + _.layout.row_h + _.margin, w = slider_w + _.margin + text_w, h = (2 * _.margin) + text_h }
 	end
